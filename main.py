@@ -19,6 +19,10 @@ from dotenv import load_dotenv
 load_dotenv()
 from langchain_groq import ChatGroq
 
+print("DEBUG: GROQ_API_KEY present in main.py:", os.environ.get('GROQ_API_KEY') is not None)
+if os.environ.get('GROQ_API_KEY'):
+    print("DEBUG: GROQ_API_KEY length in main.py:", len(os.environ.get('GROQ_API_KEY')))
+
 llm = ChatGroq(
     model="llama-3.3-70b-versatile"
 )

@@ -1,6 +1,11 @@
 import os
 import json
 import re
+
+print("DEBUG: GROQ_API_KEY present in server.py (start):", os.environ.get('GROQ_API_KEY') is not None)
+if os.environ.get('GROQ_API_KEY'):
+    print("DEBUG: GROQ_API_KEY length in server.py:", len(os.environ.get('GROQ_API_KEY')))
+
 import psycopg
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
