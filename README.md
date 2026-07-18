@@ -1,114 +1,124 @@
 # ✈️ TravelPilot AI
 
-> **Your Intelligent Multi-Agent Travel Planner**
->
-> A modern, premium, responsive travel planning application designed with a glassmorphism theme. Built on a multi-agent backend architecture using FastAPI, LangGraph, and PostgreSQL, linked to a React + TypeScript frontend.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/LangGraph-1C3C5A?style=for-the-badge&logo=chainlink&logoColor=white" alt="LangGraph" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Groq-F55050?style=for-the-badge&logo=groq&logoColor=white" alt="Groq Llama 3" />
+</p>
+
+### 🌟 "Your Intelligent Multi-Agent Travel Planner"
+
+TravelPilot AI is a modern, premium, and fully responsive travel planning platform designed with a sleek glassmorphism aesthetic. It utilizes a state-of-the-art **Multi-Agent LangGraph workflow** on a FastAPI backend, communicating with a React + TypeScript frontend to create a seamless "ChatGPT meets Airbnb" planning experience.
 
 ---
 
-## 🌟 Key Features
+## 🎨 User Interface & Aesthetics
 
-*   **ChatGPT meets Airbnb UI**: Clean, minimal, futuristic dark mode interface with glassmorphism panels, micro-animations, and full responsiveness.
-*   **Multi-Agent Collaborative System**: Powered by LangGraph agents executing specialized sub-tasks:
-    *   **Extractor Agent**: Automatically scans queries to pull departure, destination, travel dates, and days count in a single pass.
-    *   **Flight Agent & Hotel Agent**: Run in parallel concurrently to query real-time flights via Aviationstack and top accommodation lists via Tavily.
-    *   **Itinerary Agent**: Generates detailed, day-by-day slot schedules (Morning, Afternoon, Evening).
-    *   **Final Agent**: Dynamically compiles the consolidated package in-memory.
-*   **Instant Missing Parameter Validation**: Client-side validation automatically short-circuits queries missing vital details (like departure city or dates), prompting the user in less than **400ms** without wasting LLM tokens or hit network lag.
-*   **SSE Agent Progress Streaming**: Server-Sent Events (SSE) stream the real-time completion status and progress logs of each backend agent node directly to the frontend's visual progress cards.
-*   **Thread & Chat Persistence**: Sessions, sidebar previous trips history, message chains, active selections, and dark mode state are synced with `localStorage` to survive browser page refreshes.
-*   **Manageable Conversations**: Users can delete previous planning threads directly from the sidebar history panel with single-click trash controls.
-*   **High-Fidelity Offline Fallback**: Dynamically executes high-fidelity client-side simulations if backend API services hit rate limits or are offline.
+*   **Glassmorphic Design**: Tailored HSL dark colors, sleek blur panels, glowing interactive components, and smooth hover micro-animations.
+*   **Live Execution progress Monitor**: A right-side panel displays real-time step transitions and execution progress for each agent node (Flight, Hotel, Itinerary, Finalizer) via **Server-Sent Events (SSE)**.
+*   **Adaptive Theme**: Permanently defaulted to an elegant dark theme for premium contrast.
+*   **Dynamic Sidebar History**: Quick access to past itineraries with individual delete icons to keep history tidy.
+*   **Responsive Panels**: Beautifully adapts between sidebars, central chat cards, and timelines for desktops and mobile screens.
 
 ---
 
-## 🛠️ Technology Stack
+## 📐 Agent Orchestration Architecture
 
-### Frontend
-*   **Framework**: React 18, TypeScript, Vite
-*   **Styling**: Tailwind CSS
-*   **Icons & Motion**: Lucide React, Framer Motion
-
-### Backend & AI Orchestration
-*   **Framework**: FastAPI, Python 3.13
-*   **Agent framework**: LangGraph, LangChain
-*   **LLM Providers**: Groq (`llama-3.3-70b-versatile` for planning, `llama3-8b-8192` for fast formatting)
-*   **Database (Checkpointer)**: PostgreSQL (via `psycopg` and `PostgresSaver`)
-*   **External APIs**: Aviationstack API, Tavily Search API
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-*   Node.js (v18+)
-*   Python (v3.10+)
-*   PostgreSQL Database instance
-
-### 1. Backend Setup
-
-Clone the repository and navigate to the backend directory:
-```bash
-# Set up virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install fastapi uvicorn pydantic psycopg langchain langchain-groq langgraph python-dotenv
-```
-
-Create a `.env` file in the root directory:
-```env
-GROQ_API_KEY=your_groq_api_key
-AVIATIONSTACK_API_KEY=your_aviationstack_key
-TAVILY_API_KEY=your_tavily_search_key
-DATABASE_URL=postgresql://username:password@localhost:5432/your_db_name
-```
-
-Start the FastAPI backend server:
-```bash
-python3 server.py
-```
-The server will start listening at `http://localhost:8080`.
-
-### 2. Frontend Setup
-
-Navigate to the `frontend` folder:
-```bash
-cd frontend
-
-# Install Node modules
-npm install
-
-# Run the dev server
-npm run dev
-```
-The frontend will start running at `http://localhost:5173`.
-
----
-
-## 📐 Architecture & Parallel Flow
+TravelPilot AI splits travel planning into isolated, specialized sub-agents orchestrated by **LangGraph** in a concurrent execution tree:
 
 ```mermaid
 graph TD
     START([User Message]) --> Extractor[Extractor Agent]
-    Extractor --> Check{Details Present?}
+    Extractor --> Check{Parameters Present?}
     
-    Check -- No --> ItineraryMissing[Itinerary Agent: Ask for Info]
-    ItineraryMissing --> Final[Final Response]
+    Check -- No (Short-circuit in 0.4s) --> ItineraryMissing[Itinerary Agent: Request Details]
+    ItineraryMissing --> Final[Final Response Node]
     
-    Check -- Yes --> Flight[Flight Agent]
-    Check -- Yes --> Hotel[Hotel Agent]
+    Check -- Yes (Concurrently in Parallel) --> Flight[Flight Agent]
+    Check -- Yes (Concurrently in Parallel) --> Hotel[Hotel Agent]
     
     Flight --> Itinerary[Itinerary Agent]
     Hotel --> Itinerary
     
     Itinerary --> Final
-    Final --> END([Render in UI])
+    Final --> END([SSE Stream to React Client])
     
-    style Flight fill:#1e293b,stroke:#0ea5e9,stroke-width:2px
-    style Hotel fill:#1e293b,stroke:#0ea5e9,stroke-width:2px
+    style Flight fill:#0f172a,stroke:#38bdf8,stroke-width:2px
+    style Hotel fill:#0f172a,stroke:#38bdf8,stroke-width:2px
+    style Extractor fill:#1e1b4b,stroke:#818cf8,stroke-width:2px
+    style ItineraryMissing fill:#7f1d1d,stroke:#f87171,stroke-width:2px
 ```
+
+### Nodes Description:
+1.  **Extractor Agent (Entry)**: Scans user prompts using LLMs to capture departure city, destination, dates, and days count in a single pass.
+2.  **Validation Short-Circuit**: If parameters are missing, the graph immediately skips flights/hotels and routes to the request block, responding in **400ms** on the client side (bypassing server calls entirely when possible).
+3.  **Parallel Engines**: Flight and Hotel agents run concurrently to fetch details from Aviationstack and Tavily Search.
+4.  **Consolidation**: The Itinerary Agent takes the parallel outputs and structures a day-by-day slot agenda (Morning, Afternoon, Evening).
+5.  **Fast JSON Parsing**: The server formats final textual responses using the high-speed `llama3-8b-8192` model (under 0.4s) to assemble structured profiles.
+
+---
+
+## 📂 Repository Structure
+
+```
+├── main.py                 # LangGraph workflow, State definition, and Agent nodes
+├── server.py               # FastAPI server hosting SSE planning stream
+├── tools/                  # Custom tools for flights and search
+│   ├── flight_tools.py     # Aviationstack API IATA airport matching & search
+│   └── tavily_tool.py      # Tavily search wrapper for accommodation reviews
+├── frontend/               # React client application
+│   ├── src/
+│   │   ├── App.tsx         # Main container, localStorage hook sync, client-side validation
+│   │   ├── components/     # UI elements (Sidebar, Navbar, AgentPanel, ChatArea)
+│   │   └── types.ts        # TypeScript typings for trips, flights, hotels
+└── README.md               # Documentation
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Database Setup
+A PostgreSQL instance is used as the state checkpointer for LangGraph threads. Ensure you have a running PostgreSQL database:
+```sql
+CREATE DATABASE travelpilot;
+```
+
+### 2. Environment Variables
+Create a `.env` file in the root directory:
+```env
+GROQ_API_KEY=your_groq_api_key
+AVIATIONSTACK_API_KEY=your_aviationstack_key
+TAVILY_API_KEY=your_tavily_search_key
+DATABASE_URL=postgresql://username:password@localhost:5432/travelpilot
+```
+
+### 3. Backend Launch
+```bash
+# Initialize Virtual Environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install Core packages
+pip install fastapi uvicorn pydantic psycopg langchain langchain-groq langgraph python-dotenv
+
+# Run Server
+python3 server.py
+```
+FastAPI runs on `http://localhost:8080`.
+
+### 4. Frontend Launch
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Dev client runs on `http://localhost:5173`.
+
+---
 
 ## 🔒 License
 Private Repository - Proprietary code. Designed for TravelPilot AI presentations.
@@ -116,4 +126,7 @@ Private Repository - Proprietary code. Designed for TravelPilot AI presentations
 ---
 
 ## 👤 Author
-*   **Om Bansal** - *Design & Development* - [@om0710](https://github.com/om0710)
+
+**Om Bansal**  
+*   **GitHub**: [@om0710](https://github.com/om0710)
+*   **LinkedIn**: [Om Bansal on LinkedIn](https://www.linkedin.com/in/ombansal)
