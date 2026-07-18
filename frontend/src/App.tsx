@@ -412,28 +412,41 @@ function App() {
     
     const clean = query.toLowerCase();
     
-    // Simple keywords checks
-    if (clean.includes("tokyo")) dest = "Tokyo, Japan";
-    else if (clean.includes("paris")) dest = "Paris, France";
-    else if (clean.includes("rome")) dest = "Rome, Italy";
-    else if (clean.includes("swiss") || clean.includes("switzerland")) dest = "Swiss Alps";
-    else if (clean.includes("delhi")) dest = "Delhi, India";
-    else if (clean.includes("jaipur")) dest = "Jaipur, India";
-    else if (clean.includes("udaipur")) dest = "Udaipur, India";
-    else {
-      // Fallback extraction
-      const match = query.match(/(?:to|for|visit)\s+([A-Za-z\s]+?)(?:\s+of|\s+for|\s+\d+|\s+day|$)/i);
-      if (match && match[1]) dest = match[1].trim();
+    // 1. Identify departure city: find what follows "from", "leaving from", "flying from", etc.
+    if (clean.includes("from gwl") || clean.includes("from gwalior")) {
+      dep = "Gwalior";
+    } else if (clean.includes("from mumbai") || clean.includes("from bom")) {
+      dep = "Mumbai";
+    } else if (clean.includes("from delhi") || clean.includes("from del") || clean.includes("leaving from delhi") || clean.includes("leaving from del")) {
+      dep = "Delhi";
+    } else if (clean.includes("from tokyo") || clean.includes("from nrt")) {
+      dep = "Tokyo";
+    } else {
+      // General regex search for departure
+      const depMatch = clean.match(/(?:from|leaving\s+from|flying\s+from|departing\s+from)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\s+in|\s+at|\b\d|$)/i);
+      if (depMatch && depMatch[1]) {
+        dep = depMatch[1].trim();
+      }
     }
-    
-    // Find departure city
-    if (clean.includes("from gwl") || clean.includes("from gwalior")) dep = "Gwalior";
-    else if (clean.includes("from delhi") || clean.includes("from del")) dep = "Delhi";
-    else if (clean.includes("from mumbai") || clean.includes("from bom")) dep = "Mumbai";
-    else if (clean.includes("from tokyo") || clean.includes("from nrt")) dep = "Tokyo";
+
+    // 2. Identify destination: look for cities in the query, but EXCLUDE the departure city!
+    const checkDest = (city: string) => {
+      return clean.includes(city) && !dep.toLowerCase().includes(city);
+    };
+
+    if (checkDest("tokyo")) dest = "Tokyo, Japan";
+    else if (checkDest("paris")) dest = "Paris, France";
+    else if (checkDest("rome")) dest = "Rome, Italy";
+    else if (checkDest("swiss") || checkDest("switzerland")) dest = "Swiss Alps";
+    else if (checkDest("jaipur")) dest = "Jaipur, India";
+    else if (checkDest("udaipur")) dest = "Udaipur, India";
+    else if (checkDest("delhi")) dest = "Delhi, India";
     else {
-      const match = query.match(/from\s+([A-Za-z\s]+?)(?:\s+to|\s+on|\s+for|$)/i);
-      if (match && match[1]) dep = match[1].trim();
+      // Fallback: regex matching "to [city]" or "for [city]" or "visit [city]"
+      const destMatch = clean.match(/(?:to|for|visit|trip\s+for|trip\s+to)\s+([a-z\s]+?)(?:\s+from|\s+on|\s+for|\s+leaving|\s+flying|\s+\d|$)/i);
+      if (destMatch && destMatch[1] && !destMatch[1].includes(dep.toLowerCase())) {
+        dest = destMatch[1].trim();
+      }
     }
     
     return {
