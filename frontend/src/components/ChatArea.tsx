@@ -159,7 +159,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     <div
                       className={`py-3.5 px-5 rounded-2xl text-sm leading-relaxed ${
                         isAI
-                          ? 'bg-white dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/30 text-slate-700 dark:text-slate-350 shadow-sm rounded-tl-none'
+                          ? 'bg-white dark:bg-slate-900 border border-slate-200/40 dark:border-slate-800/30 text-slate-700 dark:text-slate-200 shadow-sm rounded-tl-none'
                           : 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-medium shadow-sm rounded-tr-none'
                       }`}
                     >
@@ -242,7 +242,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     <span className="w-2 h-2 rounded-full bg-brand-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-2 h-2 rounded-full bg-brand-500 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
-                  <span className="text-xs text-slate-450 dark:text-slate-500 font-semibold uppercase tracking-wider">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
                     Orchestrator running agents...
                   </span>
                 </div>
@@ -273,7 +273,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             className={`p-3 transition-colors rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/30 ${
               isListening
                 ? 'text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 ring-4 ring-rose-500/10'
-                : 'text-slate-450 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200'
             }`}
           >
             {isListening ? (

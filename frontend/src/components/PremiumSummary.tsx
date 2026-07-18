@@ -60,7 +60,7 @@ export const PremiumSummary: React.FC<PremiumSummaryProps> = ({ summary }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Places to Visit */}
         <div className="space-y-3.5">
-          <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-350">
+          <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-200">
             <Compass className="w-4.5 h-4.5 text-brand-500" />
             <h4 className="text-sm font-bold">Must-Visit Places</h4>
           </div>
@@ -76,7 +76,7 @@ export const PremiumSummary: React.FC<PremiumSummaryProps> = ({ summary }) => {
 
         {/* Things to Carry */}
         <div className="space-y-3.5">
-          <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-350">
+          <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-200">
             <Briefcase className="w-4.5 h-4.5 text-brand-500" />
             <h4 className="text-sm font-bold">Recommended Packing Checklist</h4>
           </div>
