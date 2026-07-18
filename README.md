@@ -129,4 +129,4 @@ Private Repository - Proprietary code. Designed for TravelPilot AI presentations
 
 **Om Bansal**  
 *   **GitHub**: [@om0710](https://github.com/om0710)
-*   **LinkedIn**: [Om Bansal on LinkedIn](https://www.linkedin.com/in/om-bansal-78420430a/)
+*   **LinkedIn**: [https://www.linkedin.com/in/om-bansal-78420430a/](https://www.linkedin.com/in/om-bansal-78420430a/)
