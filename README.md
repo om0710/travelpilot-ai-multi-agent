@@ -110,7 +110,10 @@ graph TD
     style Hotel fill:#1e293b,stroke:#0ea5e9,stroke-width:2px
 ```
 
----
-
 ## 🔒 License
 Private Repository - Proprietary code. Designed for TravelPilot AI presentations.
+
+---
+
+## 👤 Author
+*   **Om Bansal** - *Design & Development* - [@om0710](https://github.com/om0710)
