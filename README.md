@@ -121,7 +121,7 @@ Dev client runs on `http://localhost:5173`.
 ---
 
 ## 🔒 License
-Private Repository - Proprietary code. Designed for TravelPilot AI presentations.
+Designed for TravelPilot AI presentations. Open source for educational and portfolio presentation purposes.
 
 ---
 
