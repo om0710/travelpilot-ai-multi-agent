@@ -3,6 +3,7 @@ import json
 import re
 
 print("DEBUG: GROQ_API_KEY present in server.py (start):", os.environ.get('GROQ_API_KEY') is not None)
+print("DEBUG: All available environment keys:", list(os.environ.keys()))
 if os.environ.get('GROQ_API_KEY'):
     print("DEBUG: GROQ_API_KEY length in server.py:", len(os.environ.get('GROQ_API_KEY')))
 
