@@ -332,7 +332,7 @@ function App() {
 
 
     try {
-      const apiHost = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const apiHost = import.meta.env.VITE_API_URL || 'https://travelpilot-ai-multi-agent.vercel.app';
       const response = await fetch(`${apiHost}/api/plan`, {
         method: 'POST',
         headers: {
