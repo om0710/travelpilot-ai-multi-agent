@@ -261,7 +261,8 @@ def plan_trip(req: PlanRequest):
                 3. Fill in reasonable mock details (e.g. generic images/timings/codes/logos) if they are missing from the inputs.
                 4. Populate the "date" field in each flight using the user's travel dates (e.g. the first date of the trip).
                 5. Do NOT use a hardcoded static price. Generate dynamic, realistic flight prices in INR (₹) matching the flight route (for example, flights between India and Europe/America/Asia should be around ₹45,000 to ₹80,000, while domestic flights within India should be around ₹4,500 to ₹9,500).
-                6. Make sure key names match the schema exactly.
+                6. Align all hotel details (names, ratings, pricing, amenities) to match the user's budget and style intent in the query. If the user asks for cheap or budget hotels, ensure the parsed hotels are hostels/budget hotels with prices in the range of ₹1,000 to ₹4,000. If they ask for luxury, provide premium 5-star hotels with prices in the range of ₹25,000 to ₹75,000.
+                7. Make sure key names match the schema exactly.
                 """
 
                 # Ask LLM to format it as JSON

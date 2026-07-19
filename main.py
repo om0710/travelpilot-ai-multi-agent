@@ -116,8 +116,21 @@ def hotel_agent(state :TravelState ):
         
     dest = state.get("destination") or "your destination"
     
-    # Query hotels ONLY in the clean destination city
-    hotel_results = tavily_search(f"best luxury and mid-range hotels in {dest}")
+    # Generate a customized Tavily search query based on user's specific budget, style, and travel query context using the LLM
+    try:
+        query_prompt = f"""
+        User Query: "{state.get('user_query', '')}"
+        Destination: "{dest}"
+        Generate a short search query (maximum 6 words) optimized for Tavily to find hotels/accommodations matching the user's budget, style, and travel intent.
+        Return ONLY the raw search query text and nothing else. Do not include quotes.
+        """
+        search_query = llm.invoke([HumanMessage(content=query_prompt)]).content.strip()
+        search_query = search_query.replace('"', '').replace("'", "")
+    except Exception as e:
+        print(f"Error generating dynamic search query: {e}")
+        search_query = f"best hotels in {dest}"
+
+    hotel_results = tavily_search(search_query)
     return {
         "hotel_results" : hotel_results,
         "messages": [
