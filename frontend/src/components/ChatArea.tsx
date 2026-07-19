@@ -172,7 +172,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     </span>
 
                     {/* Flight Results Card */}
-                    {message.flights && message.flights.length > 0 && (
+                    {message.flights && message.flights.length > 0 && !message.showHotelsOnly && !message.showItineraryOnly && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -189,7 +189,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     )}
 
                     {/* Hotel Results Card */}
-                    {message.hotels && message.hotels.length > 0 && (
+                    {message.hotels && message.hotels.length > 0 && !message.showFlightsOnly && !message.showItineraryOnly && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -204,7 +204,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     )}
 
                     {/* Itinerary Timeline */}
-                    {message.itinerary && message.itinerary.length > 0 && (
+                    {message.itinerary && message.itinerary.length > 0 && !message.showFlightsOnly && !message.showHotelsOnly && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -219,7 +219,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                     )}
 
                     {/* Final Premium Summary Card */}
-                    {message.summary && (
+                    {message.summary && !message.showFlightsOnly && !message.showHotelsOnly && !message.showItineraryOnly && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}

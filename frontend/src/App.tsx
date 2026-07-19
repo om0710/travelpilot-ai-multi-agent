@@ -373,6 +373,10 @@ function App() {
               // Mark all agents completed
               setAgents(prev => prev.map(a => ({ ...a, status: 'completed', progress: 100, details: 'Plan assembled!' })));
 
+              const showFlightsOnly = hasTargetedIntent && isFlightQuery && !isHotelQuery && !isItineraryQuery;
+              const showHotelsOnly = hasTargetedIntent && isHotelQuery && !isFlightQuery && !isItineraryQuery;
+              const showItineraryOnly = hasTargetedIntent && isItineraryQuery && !isFlightQuery && !isHotelQuery;
+
               const finalAIMessage: Message = {
                 id: streamingId,
                 sender: 'ai',
@@ -381,7 +385,10 @@ function App() {
                 flights: data.flights,
                 hotels: data.hotels,
                 itinerary: data.itinerary,
-                summary: data.summary
+                summary: data.summary,
+                showFlightsOnly,
+                showHotelsOnly,
+                showItineraryOnly
               };
 
               setTripsConversations(prev => ({
@@ -475,6 +482,15 @@ function App() {
   const runOfflineSimulation = (dest: string, threadId: string, aiMsgId: string, baseConvo: Message[], daysCount: number, originalQuery?: string) => {
     const query = (originalQuery || "").toLowerCase();
     
+    const isFlight = query.includes("flight") || query.includes("fly") || query.includes("departure") || query.includes("from ") || query.includes("ticket") || query.includes("airline");
+    const isHotel = query.includes("hotel") || query.includes("stay") || query.includes("accommodation") || query.includes("resort") || query.includes("hostel") || query.includes("room") || query.includes("cheap") || query.includes("budget") || query.includes("luxury");
+    const isItinerary = query.includes("itinerary") || query.includes("schedule") || query.includes("plan") || query.includes("day") || query.includes("visit") || query.includes("sightseeing");
+
+    const hasTargeted = isFlight || isHotel || isItinerary;
+    const showFlightsOnly = hasTargeted && isFlight && !isHotel && !isItinerary;
+    const showHotelsOnly = hasTargeted && isHotel && !isFlight && !isItinerary;
+    const showItineraryOnly = hasTargeted && isItinerary && !isFlight && !isHotel;
+
     const hasDeparture = query.includes("from") || query.includes("departure") || query.includes("departing") || query.includes("leaving") || query.includes("fly");
     const hasDates = query.includes("on ") || query.includes("date") || query.includes("january") || query.includes("february") || query.includes("march") || query.includes("april") || query.includes("may") || query.includes("june") || query.includes("july") || query.includes("august") || query.includes("september") || query.includes("october") || query.includes("november") || query.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(query) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(query) || /(?:202\d)/.test(query) || /\b\d{1,2}\b/.test(query);
     const hasDestination = query.includes("to ") || query.includes("trip for") || query.includes("visit ") || query.includes("jaipur") || query.includes("tokyo") || query.includes("paris") || query.includes("rome") || query.includes("swiss") || query.includes("switzerland") || query.includes("delhi") || query.includes("udaipur") || query.includes("travel");
@@ -496,7 +512,10 @@ function App() {
         id: aiMsgId,
         sender: 'ai',
         content: `I would be happy to help you plan your trip! However, to search flights and customize your itinerary, I need you to provide your ${missingStr}. Could you please specify these details?`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        showFlightsOnly,
+        showHotelsOnly,
+        showItineraryOnly
       };
 
       setTripsConversations(prev => ({
@@ -594,7 +613,10 @@ function App() {
                     flights: getMockFlights(parsedDest, dep, flightDate),
                     hotels: getMockHotels(parsedDest, query),
                     itinerary: getMockItinerary(parsedDest, daysCount),
-                    summary: getMockSummary(parsedDest, daysCount, dep)
+                    summary: getMockSummary(parsedDest, daysCount, dep),
+                    showFlightsOnly,
+                    showHotelsOnly,
+                    showItineraryOnly
                   };
 
                   setTripsConversations(prev => ({

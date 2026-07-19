@@ -69,6 +69,9 @@ export interface Message {
   hotels?: Hotel[];
   itinerary?: ItineraryDay[];
   summary?: TravelSummary;
+  showFlightsOnly?: boolean;
+  showHotelsOnly?: boolean;
+  showItineraryOnly?: boolean;
 }
 
 export interface TripHistory {
