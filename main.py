@@ -48,6 +48,7 @@ def extract_details(query: str) -> dict:
     Identify if the user has specified:
     1. Departure city or airport code (where they will fly FROM).
     2. Destination city or country (where they will travel TO).
+       *IMPORTANT*: If the user does not specify a destination, but explicitly asks you to choose, suggest, recommend, decide, or says "according to you", "you choose", "surprise me", "anywhere", then choose a popular travel destination (like "Rome, Italy", "Tokyo, Japan", "Paris, France", or "Jaipur, India") and set it as the "destination". Do NOT return null in this case.
     3. Exact travel dates or start date.
     4. Number of days of the trip (default to 3 if not specified).
     

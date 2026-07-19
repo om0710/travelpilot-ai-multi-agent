@@ -236,6 +236,16 @@ function App() {
     const allUserMessages = currentConvo.filter(m => m.sender === 'user').map(m => m.content);
     const combinedQueryText = allUserMessages.join(" | ").toLowerCase();
 
+    // Check if the user is asking the model to recommend or choose a destination
+    const isRecommendationQuery = combinedQueryText.includes("according to you") || 
+                                  combinedQueryText.includes("you choose") || 
+                                  combinedQueryText.includes("choose for me") || 
+                                  combinedQueryText.includes("surprise me") || 
+                                  combinedQueryText.includes("anywhere") || 
+                                  combinedQueryText.includes("recommend") || 
+                                  combinedQueryText.includes("suggest") || 
+                                  combinedQueryText.includes("you decide");
+
     // Extract destination name from the combined query context
     let destination = 'Udaipur'; // default fallback
     const cleanQuery = combinedQueryText;
@@ -245,6 +255,7 @@ function App() {
     else if (cleanQuery.includes('swiss alps') || cleanQuery.includes('switzerland')) destination = 'Swiss Alps';
     else if (cleanQuery.includes('delhi') || cleanQuery.includes('india')) destination = 'Delhi, India';
     else if (cleanQuery.includes('udaipur')) destination = 'Udaipur, India';
+    else if (isRecommendationQuery) destination = 'Rome, Italy'; // default recommendation if user leaves it up to us
     else {
       // Find matches for "to [place]" or "for [place]" or "visit [place]"
       const match = cleanQuery.match(/(?:to|for|visit)\s+([A-Za-z\s]+?)(?:\s+of|\s+for|\s+\d+|\s+day|$)/i);
@@ -291,7 +302,18 @@ function App() {
     // Validate required query parameters on the client side using the combined query text!
     const hasDeparture = combinedQueryText.includes("from ") || combinedQueryText.includes("flying from") || combinedQueryText.includes("fly from") || combinedQueryText.includes("departing from");
     const hasDates = combinedQueryText.includes("on ") || combinedQueryText.includes("date") || combinedQueryText.includes("january") || combinedQueryText.includes("february") || combinedQueryText.includes("march") || combinedQueryText.includes("april") || combinedQueryText.includes("may") || combinedQueryText.includes("june") || combinedQueryText.includes("july") || combinedQueryText.includes("august") || combinedQueryText.includes("september") || combinedQueryText.includes("october") || combinedQueryText.includes("november") || combinedQueryText.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(combinedQueryText) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(combinedQueryText);
-    const hasDestination = combinedQueryText.includes("to ") || combinedQueryText.includes("trip for") || combinedQueryText.includes("visit ") || combinedQueryText.includes("jaipur") || combinedQueryText.includes("tokyo") || combinedQueryText.includes("paris") || combinedQueryText.includes("rome") || combinedQueryText.includes("swiss") || combinedQueryText.includes("switzerland") || combinedQueryText.includes("delhi") || combinedQueryText.includes("udaipur");
+    const hasDestination = isRecommendationQuery || 
+                           combinedQueryText.includes("to ") || 
+                           combinedQueryText.includes("trip for") || 
+                           combinedQueryText.includes("visit ") || 
+                           combinedQueryText.includes("jaipur") || 
+                           combinedQueryText.includes("tokyo") || 
+                           combinedQueryText.includes("paris") || 
+                           combinedQueryText.includes("rome") || 
+                           combinedQueryText.includes("swiss") || 
+                           combinedQueryText.includes("switzerland") || 
+                           combinedQueryText.includes("delhi") || 
+                           combinedQueryText.includes("udaipur");
 
     if (!hasDeparture || !hasDestination || !hasDates) {
       setTimeout(() => {
