@@ -475,9 +475,9 @@ function App() {
   const runOfflineSimulation = (dest: string, threadId: string, aiMsgId: string, baseConvo: Message[], daysCount: number, originalQuery?: string) => {
     const query = (originalQuery || "").toLowerCase();
     
-    const hasDeparture = query.includes("from ") || query.includes("flying from") || query.includes("fly from") || query.includes("departing from");
-    const hasDates = query.includes("on ") || query.includes("date") || query.includes("january") || query.includes("february") || query.includes("march") || query.includes("april") || query.includes("may") || query.includes("june") || query.includes("july") || query.includes("august") || query.includes("september") || query.includes("october") || query.includes("november") || query.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(query) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(query);
-    const hasDestination = query.includes("to ") || query.includes("trip for") || query.includes("visit ") || query.includes("jaipur") || query.includes("tokyo") || query.includes("paris") || query.includes("rome") || query.includes("swiss") || query.includes("switzerland") || query.includes("delhi") || query.includes("udaipur");
+    const hasDeparture = query.includes("from") || query.includes("departure") || query.includes("departing") || query.includes("leaving") || query.includes("fly");
+    const hasDates = query.includes("on ") || query.includes("date") || query.includes("january") || query.includes("february") || query.includes("march") || query.includes("april") || query.includes("may") || query.includes("june") || query.includes("july") || query.includes("august") || query.includes("september") || query.includes("october") || query.includes("november") || query.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(query) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(query) || /(?:202\d)/.test(query) || /\b\d{1,2}\b/.test(query);
+    const hasDestination = query.includes("to ") || query.includes("trip for") || query.includes("visit ") || query.includes("jaipur") || query.includes("tokyo") || query.includes("paris") || query.includes("rome") || query.includes("swiss") || query.includes("switzerland") || query.includes("delhi") || query.includes("udaipur") || query.includes("travel");
     
     if (!hasDeparture || !hasDestination || !hasDates) {
       updateAgent('flight', 'failed', 0, 'Missing flight parameters...');
