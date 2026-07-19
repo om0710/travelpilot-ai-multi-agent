@@ -415,7 +415,7 @@ function App() {
     } catch (err) {
       console.warn("Backend unavailable or streaming failed, running offline custom simulation:", err);
       // Fallback: Run local high-fidelity simulation
-      runOfflineSimulation(destination, threadId, streamingId, currentConvo, daysCount, combinedQueryText);
+      runOfflineSimulation(destination, threadId, streamingId, currentConvo, daysCount, combinedQueryText, userMsgText);
     }
   };
 
@@ -427,7 +427,7 @@ function App() {
     const clean = query.toLowerCase();
     
     // Match "departure is [city]" or "departure city is [city]" or "departing from [city]"
-    const departureIsMatch = clean.match(/(?:departure\s+city\s+is|departure\s+is)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\s+i\s+plan|\s+plan|\b\d|$)/i);
+    const departureIsMatch = clean.match(/(?:departure\s+city\s+is|departure\s+is)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\band\b|\bdates\b|\bwith\b|\bi\s+plan|\s+plan|\b\d|$)/i);
     
     if (departureIsMatch && departureIsMatch[1]) {
       dep = departureIsMatch[1].trim();
@@ -441,7 +441,7 @@ function App() {
       dep = "Tokyo";
     } else {
       // General regex search for departure
-      const depMatch = clean.match(/(?:from|leaving\s+from|flying\s+from|departing\s+from)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\s+in|\s+at|\b\d|$)/i);
+      const depMatch = clean.match(/(?:from|leaving\s+from|flying\s+from|departing\s+from)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\s+in|\s+at|\band\b|\bdates\b|\bwith\b|\b\d|$)/i);
       if (depMatch && depMatch[1]) {
         dep = depMatch[1].trim();
       }
@@ -479,12 +479,13 @@ function App() {
   };
 
   // Local Offline fallback simulation with agent step transitions
-  const runOfflineSimulation = (dest: string, threadId: string, aiMsgId: string, baseConvo: Message[], daysCount: number, originalQuery?: string) => {
+  const runOfflineSimulation = (dest: string, threadId: string, aiMsgId: string, baseConvo: Message[], daysCount: number, originalQuery?: string, latestQuery?: string) => {
     const query = (originalQuery || "").toLowerCase();
+    const lQuery = (latestQuery || originalQuery || "").toLowerCase();
     
-    const isFlight = query.includes("flight") || query.includes("fly") || query.includes("departure") || query.includes("from ") || query.includes("ticket") || query.includes("airline");
-    const isHotel = query.includes("hotel") || query.includes("stay") || query.includes("accommodation") || query.includes("resort") || query.includes("hostel") || query.includes("room") || query.includes("cheap") || query.includes("budget") || query.includes("luxury");
-    const isItinerary = query.includes("itinerary") || query.includes("schedule") || query.includes("plan") || query.includes("day") || query.includes("visit") || query.includes("sightseeing");
+    const isFlight = lQuery.includes("flight") || lQuery.includes("fly") || lQuery.includes("departure") || lQuery.includes("from ") || lQuery.includes("ticket") || lQuery.includes("airline");
+    const isHotel = lQuery.includes("hotel") || lQuery.includes("stay") || lQuery.includes("accommodation") || lQuery.includes("resort") || lQuery.includes("hostel") || lQuery.includes("room") || lQuery.includes("cheap") || lQuery.includes("budget") || lQuery.includes("luxury");
+    const isItinerary = lQuery.includes("itinerary") || lQuery.includes("schedule") || lQuery.includes("plan") || lQuery.includes("day") || lQuery.includes("visit") || lQuery.includes("sightseeing");
 
     const hasTargeted = isFlight || isHotel || isItinerary;
     const showFlightsOnly = hasTargeted && isFlight && !isHotel && !isItinerary;
