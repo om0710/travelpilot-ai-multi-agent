@@ -487,6 +487,19 @@ function App() {
     const { dep, dest: parsedDest } = parseQueryCities(originalQuery || dest);
     updateAgent('flight', 'running', 25, 'Connecting to aviationstack API...');
     
+    // Parse flight date from query if specified
+    let flightDate = undefined;
+    const dateMatch = query.match(/(?:on|from|are)\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)/i);
+    if (dateMatch && dateMatch[1]) {
+      flightDate = dateMatch[1].trim();
+      flightDate = flightDate.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    } else {
+      // Use a clean fallback date
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      flightDate = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
     setTimeout(() => {
       updateAgent('flight', 'running', 70, `Filtering flights from ${dep} to ${parsedDest}...`);
       
@@ -522,7 +535,7 @@ function App() {
                     sender: 'ai',
                     content: `Here is the comprehensive offline travel plan I generated for your journey to ${parsedDest}. I checked flight options, hotels, and structured a detailed timeline for your convenience.`,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    flights: getMockFlights(parsedDest, dep),
+                    flights: getMockFlights(parsedDest, dep, flightDate),
                     hotels: getMockHotels(parsedDest),
                     itinerary: getMockItinerary(parsedDest, daysCount),
                     summary: getMockSummary(parsedDest, daysCount, dep)
@@ -561,7 +574,7 @@ function App() {
   };
 
   // Helper dynamic mock data based on destination name
-  function getMockFlights(dest: string, dep: string = "Delhi"): Flight[] {
+  function getMockFlights(dest: string, dep: string = "Delhi", flightDate?: string): Flight[] {
     const depCode = dep.slice(0, 3).toUpperCase();
     const destCode = dest.slice(0, 3).toUpperCase();
     
@@ -575,12 +588,29 @@ function App() {
       "Jaipur": "JAI",
       "Udaipur": "UDR",
       "Switzerland": "ZRH",
-      "Swiss Alps": "ZRH"
+      "Swiss Alps": "ZRH",
+      "Banglore": "BLR",
+      "Bangalore": "BLR"
     };
     
     const dCode = codeMap[dep] || depCode;
     const aCode = codeMap[dest] || destCode;
+
+    // Check if flight route is international
+    const isInternational = dest.toLowerCase().includes("tokyo") || 
+                            dest.toLowerCase().includes("paris") || 
+                            dest.toLowerCase().includes("rome") || 
+                            dest.toLowerCase().includes("swiss") ||
+                            dest.toLowerCase().includes("switzerland") ||
+                            dep.toLowerCase().includes("tokyo") || 
+                            dep.toLowerCase().includes("paris") || 
+                            dep.toLowerCase().includes("rome");
     
+    const price1 = isInternational ? "₹54,200" : "₹6,400";
+    const price2 = isInternational ? "₹49,800" : "₹5,800";
+    const dur = isInternational ? "9h 45m" : "2h 45m";
+    const stopover = isInternational ? "1 Stop" : "Direct";
+
     return [
       {
         id: `f-dyn-1`,
@@ -590,10 +620,11 @@ function App() {
         departureTime: '10:30 AM',
         arrival: aCode,
         arrivalTime: '01:15 PM',
-        duration: '2h 45m',
-        stops: 'Direct',
-        price: '₹6,400',
-        status: 'Scheduled'
+        duration: dur,
+        stops: stopover,
+        price: price1,
+        status: 'Scheduled',
+        date: flightDate
       },
       {
         id: `f-dyn-2`,
@@ -603,10 +634,11 @@ function App() {
         departureTime: '04:50 PM',
         arrival: aCode,
         arrivalTime: '07:35 PM',
-        duration: '2h 45m',
-        stops: 'Direct',
-        price: '₹5,800',
-        status: 'Scheduled'
+        duration: dur,
+        stops: stopover,
+        price: price2,
+        status: 'Scheduled',
+        date: flightDate
       }
     ];
   }

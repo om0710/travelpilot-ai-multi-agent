@@ -10,6 +10,7 @@ export interface Flight {
   stops: string;
   price: string;
   status: string;
+  date?: string;
 }
 
 export interface Hotel {

@@ -26,9 +26,16 @@ export const FlightCard: React.FC<FlightCardProps> = ({ flight }) => {
           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
             {flight.airlineName}
           </h4>
-          <span className="text-[10px] py-0.5 px-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 font-semibold tracking-wide uppercase">
-            {flight.status}
-          </span>
+          <div className="flex items-center space-x-1.5 mt-0.5">
+            <span className="text-[10px] py-0.5 px-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 font-semibold tracking-wide uppercase">
+              {flight.status}
+            </span>
+            {flight.date && (
+              <span className="text-[10px] py-0.5 px-2 bg-brand-500/10 rounded-full text-brand-600 dark:text-brand-400 font-bold tracking-wide">
+                {flight.date}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

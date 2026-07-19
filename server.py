@@ -131,7 +131,8 @@ def plan_trip(req: PlanRequest):
                       "duration": "6h 15m",
                       "stops": "Direct or 1 Stop",
                       "price": "₹42,800",
-                      "status": "Scheduled"
+                      "status": "Scheduled",
+                      "date": "23 Aug 2026"
                     }}
                   ],
                   "hotels": [
@@ -170,7 +171,9 @@ def plan_trip(req: PlanRequest):
                 1. Return ONLY valid raw JSON.
                 2. Do NOT wrap the output in markdown block code syntax (e.g. do NOT output ```json). Just the raw braces.
                 3. Fill in reasonable mock details (e.g. generic images/timings/codes/logos) if they are missing from the inputs.
-                4. Make sure key names match the schema exactly.
+                4. Populate the "date" field in each flight using the user's travel dates (e.g. the first date of the trip).
+                5. Do NOT use a hardcoded static price. Generate dynamic, realistic flight prices in INR (₹) matching the flight route (for example, flights between India and Europe/America/Asia should be around ₹45,000 to ₹80,000, while domestic flights within India should be around ₹4,500 to ₹9,500).
+                6. Make sure key names match the schema exactly.
                 """
 
                 # Ask LLM to format it as JSON
