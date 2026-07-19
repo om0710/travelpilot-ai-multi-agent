@@ -399,8 +399,12 @@ function App() {
     
     const clean = query.toLowerCase();
     
-    // 1. Identify departure city: find what follows "from", "leaving from", "flying from", etc.
-    if (clean.includes("from gwl") || clean.includes("from gwalior")) {
+    // Match "departure is [city]" or "departure city is [city]" or "departing from [city]"
+    const departureIsMatch = clean.match(/(?:departure\s+city\s+is|departure\s+is)\s+([a-z\s]+?)(?:\s+to|\s+on|\s+for|\s+i\s+plan|\s+plan|\b\d|$)/i);
+    
+    if (departureIsMatch && departureIsMatch[1]) {
+      dep = departureIsMatch[1].trim();
+    } else if (clean.includes("from gwl") || clean.includes("from gwalior")) {
       dep = "Gwalior";
     } else if (clean.includes("from mumbai") || clean.includes("from bom")) {
       dep = "Mumbai";
@@ -530,13 +534,18 @@ function App() {
                 setTimeout(() => {
                   updateAgent('final', 'completed', 100, 'Checkpointer stored successfully!');
                   
+                  const isCheapRequest = query.includes("cheap") || query.includes("budget") || query.includes("low cost") || query.includes("affordable");
+                  const contentText = isCheapRequest 
+                    ? `I have filtered and updated the recommendations to focus on budget-friendly and cheap hotels in ${parsedDest} along with flight details departing from ${dep}.`
+                    : `Here is the comprehensive offline travel plan I generated for your journey to ${parsedDest}. I checked flight options, hotels, and structured a detailed timeline for your convenience.`;
+
                   const finalAIMessage: Message = {
                     id: aiMsgId,
                     sender: 'ai',
-                    content: `Here is the comprehensive offline travel plan I generated for your journey to ${parsedDest}. I checked flight options, hotels, and structured a detailed timeline for your convenience.`,
+                    content: contentText,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     flights: getMockFlights(parsedDest, dep, flightDate),
-                    hotels: getMockHotels(parsedDest),
+                    hotels: getMockHotels(parsedDest, query),
                     itinerary: getMockItinerary(parsedDest, daysCount),
                     summary: getMockSummary(parsedDest, daysCount, dep)
                   };
@@ -643,12 +652,18 @@ function App() {
     ];
   }
 
-  function getMockHotels(dest: string): Hotel[] {
+  function getMockHotels(dest: string, queryText?: string): Hotel[] {
     const loc = dest.split(',')[0].trim();
     const cleanDest = dest.toLowerCase();
+    const isCheapRequest = queryText?.toLowerCase().includes("cheap") || 
+                           queryText?.toLowerCase().includes("budget") || 
+                           queryText?.toLowerCase().includes("low cost") ||
+                           queryText?.toLowerCase().includes("affordable");
+
+    let hotelsList: Hotel[] = [];
     
     if (cleanDest.includes('jaipur')) {
-      return [
+      hotelsList = [
         {
           id: 'h-jai-1',
           image: 'https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&q=80&w=400',
@@ -666,10 +681,19 @@ function App() {
           price: '₹14,500',
           amenities: ['Free Wi-Fi', 'Swimming Pool', 'Multi-cuisine Restaurant'],
           location: 'Station Road, Jaipur'
-         }
+        },
+        {
+          id: 'h-jai-3',
+          image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&q=80&w=400',
+          name: 'Zostel Jaipur (Cheap)',
+          rating: 4.5,
+          price: '₹1,200',
+          amenities: ['Free Wi-Fi', 'Rooftop Cafe', 'Social Common Room'],
+          location: 'Hawa Mahal Bazaar, Jaipur'
+        }
       ];
     } else if (cleanDest.includes('tokyo')) {
-      return [
+      hotelsList = [
         {
           id: 'h-tyo-1',
           image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80&w=400',
@@ -678,10 +702,28 @@ function App() {
           price: '₹72,000',
           amenities: ['Pool', 'Fitness Center', 'Free Wi-Fi', 'Luxury Spa'],
           location: 'Shinjuku, Tokyo'
+        },
+        {
+          id: 'h-tyo-2',
+          image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&q=80&w=400',
+          name: 'Shinjuku Washington Hotel',
+          rating: 4.3,
+          price: '₹12,500',
+          amenities: ['Free Wi-Fi', 'Airport Shuttle', 'Japanese Restaurant'],
+          location: 'Nishi-Shinjuku, Tokyo'
+        },
+        {
+          id: 'h-tyo-3',
+          image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=400',
+          name: 'Capsule Hotel Anshin Oyado (Cheap)',
+          rating: 4.4,
+          price: '₹4,200',
+          amenities: ['Onsen Bath', 'Capsule Sleep Pods', 'Free Soft Drinks'],
+          location: 'Shinjuku Center, Tokyo'
         }
       ];
     } else if (cleanDest.includes('paris')) {
-      return [
+      hotelsList = [
         {
           id: 'h-par-1',
           image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=400',
@@ -690,10 +732,28 @@ function App() {
           price: '₹55,000',
           amenities: ['Eiffel Tower View', 'Dior Spa', 'Garden Courtyard'],
           location: 'Avenue Montaigne, Paris'
+        },
+        {
+          id: 'h-par-2',
+          image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&q=80&w=400',
+          name: 'Novotel Paris Centre Tour Eiffel',
+          rating: 4.4,
+          price: '₹18,500',
+          amenities: ['Swimming Pool', 'Fitness Room', 'Seine River View'],
+          location: 'Front de Seine, Paris'
+        },
+        {
+          id: 'h-par-3',
+          image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=400',
+          name: 'Generator Paris Hostel (Cheap)',
+          rating: 4.2,
+          price: '₹3,800',
+          amenities: ['Rooftop Bar', 'Social Lounge', 'Laundry Service'],
+          location: '10th Arrondissement, Paris'
         }
       ];
     } else if (cleanDest.includes('rome')) {
-      return [
+      hotelsList = [
         {
           id: 'h-rom-1',
           image: 'https://images.unsplash.com/photo-1582719478250-c89cae4db85b?auto=format&fit=crop&q=80&w=400',
@@ -702,10 +762,28 @@ function App() {
           price: '₹41,000',
           amenities: ['Secret Garden', 'Full-service Spa', 'Historical Courtyard'],
           location: 'Piazza del Popolo, Rome'
+        },
+        {
+          id: 'h-rom-2',
+          image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=400',
+          name: 'IQ Hotel Roma',
+          rating: 4.6,
+          price: '₹14,200',
+          amenities: ['Sauna', 'Rooftop Terrace', 'Self-service Laundry'],
+          location: 'Repubblica Area, Rome'
+        },
+        {
+          id: 'h-rom-3',
+          image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=400',
+          name: 'The YellowSquare Rome (Cheap)',
+          rating: 4.5,
+          price: '₹3,500',
+          amenities: ['Live Concert Hall', 'Shared Kitchen', 'Bicycle Rental'],
+          location: 'Termini Station, Rome'
         }
       ];
     } else if (cleanDest.includes('swiss') || cleanDest.includes('switzerland')) {
-      return [
+      hotelsList = [
         {
           id: 'h-swi-1',
           image: 'https://images.unsplash.com/photo-1502784444187-359ac186c5bb?auto=format&fit=crop&q=80&w=400',
@@ -714,21 +792,46 @@ function App() {
           price: '₹48,000',
           amenities: ['Indoor Fireplace', 'Alpine Spa', 'Heated Pool', 'Ski Butler'],
           location: 'Andermatt, Switzerland'
+        },
+        {
+          id: 'h-swi-2',
+          image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&q=80&w=400',
+          name: 'Swiss Alpine Lodge (Cheap)',
+          rating: 4.4,
+          price: '₹5,600',
+          amenities: ['Scenic Mountain Views', 'Hot Tub', 'Complimentary Cocoa'],
+          location: 'Grindelwald, Switzerland'
+        }
+      ];
+    } else {
+      hotelsList = [
+        {
+          id: 'h-gen-1',
+          image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=400',
+          name: `The ${loc} Grand Lodge`,
+          rating: 4.5,
+          price: '₹8,500',
+          amenities: ['Free Wi-Fi', 'Breakfast Buffet', 'Pool Access'],
+          location: `Central Area, ${loc}`
+        },
+        {
+          id: 'h-gen-2',
+          image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=400',
+          name: `Backpackers ${loc} Stay (Cheap)`,
+          rating: 4.2,
+          price: '₹1,800',
+          amenities: ['Shared Bunks', 'Social Lounge', 'Kitchen Access'],
+          location: `Old Town, ${loc}`
         }
       ];
     }
 
-    return [
-      {
-        id: 'h-gen-1',
-        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=400',
-        name: `The ${loc} Grand Lodge`,
-        rating: 4.5,
-        price: '₹8,500',
-        amenities: ['Free Wi-Fi', 'Breakfast Buffet', 'Pool Access'],
-        location: `Central Area, ${loc}`
-      }
-    ];
+    if (isCheapRequest) {
+      // Return hotels under 20k, showing cheapest first
+      return hotelsList.filter(h => h.name.toLowerCase().includes("cheap") || parseInt(h.price.replace(/[^\d]/g, "")) < 20000).reverse();
+    }
+    
+    return hotelsList;
   }
 
   function getMockItinerary(dest: string, daysCount: number = 3): ItineraryDay[] {
