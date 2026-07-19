@@ -80,10 +80,10 @@ def extractor_agent(state: TravelState):
     combined_query = " | ".join(user_messages) if user_messages else query
     details = extract_details(combined_query)
     return {
-        "departure": details.get("departure"),
-        "destination": details.get("destination"),
-        "dates": details.get("dates"),
-        "days": details.get("days", 3)
+        "departure": details.get("departure") or state.get("departure"),
+        "destination": details.get("destination") or state.get("destination"),
+        "dates": details.get("dates") or state.get("dates"),
+        "days": details.get("days") or state.get("days") or 3
     }
 
 def flight_agent(state :TravelState ):
