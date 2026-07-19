@@ -34,6 +34,94 @@ app.add_middleware(
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>TravelPilot AI Backend</title>
+        <style>
+            body {
+                background-color: #0b0f19;
+                color: #f8fafc;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                padding: 40px;
+                text-align: center;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+            }
+            .status-dot {
+                width: 12px;
+                height: 12px;
+                background-color: #10b981;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 8px;
+                box-shadow: 0 0 12px #10b981;
+                animation: pulse 2s infinite;
+            }
+            .status-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(16, 185, 129, 0.1);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                border-radius: 12px;
+                padding: 8px 16px;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #34d399;
+                font-weight: 600;
+            }
+            h1 {
+                margin: 0 0 10px 0;
+                font-size: 28px;
+                font-weight: 800;
+                background: linear-gradient(to right, #38bdf8, #6366f1);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            p {
+                color: #94a3b8;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+            @keyframes pulse {
+                0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+                70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+                100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>TravelPilot AI</h1>
+            <p>Multi-Agent Orchestrator backend server is successfully deployed and running on Railway.</p>
+            <div class="status-container">
+                <span class="status-dot"></span>
+                SYSTEM ONLINE
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return html_content
+
 class PlanRequest(BaseModel):
     query: str
     thread_id: str
@@ -207,4 +295,8 @@ def plan_trip(req: PlanRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8080, reload=True)
+    # Bind dynamically to the port provided by Railway/Render
+    port = int(os.getenv("PORT", 8080))
+    # Disable reload in production container to prevent watch limits
+    reload_mode = os.getenv("PORT") is None
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=reload_mode)
