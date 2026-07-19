@@ -300,12 +300,25 @@ function App() {
     setAgents(INITIAL_AGENTS.map(a => ({ ...a, status: 'idle', progress: 0, details: undefined })));
 
     // Validate required query parameters on the client side using the combined query text!
-    const hasDeparture = combinedQueryText.includes("from ") || combinedQueryText.includes("flying from") || combinedQueryText.includes("fly from") || combinedQueryText.includes("departing from");
+    const hasDeparture = combinedQueryText.includes("from ") || 
+                         combinedQueryText.includes("flying from") || 
+                         combinedQueryText.includes("fly from") || 
+                         combinedQueryText.includes("departing from") ||
+                         combinedQueryText.includes("departure") ||
+                         combinedQueryText.includes("leaving") ||
+                         combinedQueryText.includes("departing") ||
+                         combinedQueryText.includes("source") ||
+                         combinedQueryText.includes("origin") ||
+                         combinedQueryText.includes("fly out of") ||
+                         combinedQueryText.includes("flying out of");
     const hasDates = combinedQueryText.includes("on ") || combinedQueryText.includes("date") || combinedQueryText.includes("january") || combinedQueryText.includes("february") || combinedQueryText.includes("march") || combinedQueryText.includes("april") || combinedQueryText.includes("may") || combinedQueryText.includes("june") || combinedQueryText.includes("july") || combinedQueryText.includes("august") || combinedQueryText.includes("september") || combinedQueryText.includes("october") || combinedQueryText.includes("november") || combinedQueryText.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(combinedQueryText) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(combinedQueryText);
     const hasDestination = isRecommendationQuery || 
                            combinedQueryText.includes("to ") || 
                            combinedQueryText.includes("trip for") || 
                            combinedQueryText.includes("visit ") || 
+                           combinedQueryText.includes("destination") ||
+                           combinedQueryText.includes("traveling to") ||
+                           combinedQueryText.includes("going to") ||
                            combinedQueryText.includes("jaipur") || 
                            combinedQueryText.includes("tokyo") || 
                            combinedQueryText.includes("paris") || 
