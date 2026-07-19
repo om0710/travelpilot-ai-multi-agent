@@ -493,12 +493,34 @@ function App() {
     
     // Parse flight date from query if specified
     let flightDate = undefined;
-    const dateMatch = query.match(/(?:on|from|are)\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)/i);
-    if (dateMatch && dateMatch[1]) {
-      flightDate = dateMatch[1].trim();
-      flightDate = flightDate.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    const yearMatch = query.match(/\b(202\d)\b/);
+    const year = yearMatch ? yearMatch[1] : "2026";
+    
+    // 1. Check for range with month at the end, e.g., "from 23 to 29 July" or "23-29 July"
+    const rangeWithMonthMatch = query.match(/(?:from|on|between|are)?\s*(\d{1,2})(?:st|nd|rd|th)?(?:\s*to\s*|\s*-\s*|\s*and\s*)(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/i);
+    
+    // 2. Check for start date with month, e.g., "from 23 July to 29 July" or "23 July"
+    const startDateMatch = query.match(/(?:on|from|starts|on\s+the|date\s+is)\s*(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*/i);
+    
+    // 3. Check for standard numeric format, e.g., "23/07/2026"
+    const numericDateMatch = query.match(/\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})\b/);
+
+    if (rangeWithMonthMatch && rangeWithMonthMatch[1] && rangeWithMonthMatch[3]) {
+      const day = rangeWithMonthMatch[1];
+      const month = rangeWithMonthMatch[3].charAt(0).toUpperCase() + rangeWithMonthMatch[3].slice(1).toLowerCase();
+      flightDate = `${month} ${day}, ${year}`;
+    } else if (startDateMatch && startDateMatch[1] && startDateMatch[2]) {
+      const day = startDateMatch[1];
+      const month = startDateMatch[2].charAt(0).toUpperCase() + startDateMatch[2].slice(1).toLowerCase();
+      flightDate = `${month} ${day}, ${year}`;
+    } else if (numericDateMatch && numericDateMatch[1] && numericDateMatch[2]) {
+      const day = numericDateMatch[1];
+      const monthNum = parseInt(numericDateMatch[2]);
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = months[monthNum - 1] || "Jul";
+      flightDate = `${month} ${day}, ${year}`;
     } else {
-      // Use a clean fallback date
+      // Fallback
       const d = new Date();
       d.setDate(d.getDate() + 7);
       flightDate = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
