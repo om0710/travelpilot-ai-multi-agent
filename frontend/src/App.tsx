@@ -272,11 +272,21 @@ function App() {
       }
     }
 
-    // Parse number of days from query
+    // Parse number of days from query or calculate from date range (e.g. 23 to 29)
     let daysCount = 3; // Default
     const daysMatch = cleanQuery.match(/(\d+)\s*day/i);
     if (daysMatch && daysMatch[1]) {
       daysCount = parseInt(daysMatch[1]);
+    } else {
+      // Match range like "23 to 29" or "23 - 29" or "23rd to 29th"
+      const rangeMatch = cleanQuery.match(/(\d{1,2})(?:st|nd|rd|th)?\s*(?:to|and|until|-|through)\s*(\d{1,2})(?:st|nd|rd|th)?/i);
+      if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
+        const start = parseInt(rangeMatch[1]);
+        const end = parseInt(rangeMatch[2]);
+        if (end > start && end - start < 31) {
+          daysCount = end - start + 1; // inclusive days
+        }
+      }
     }
 
     setCurrentTripName(destination);
@@ -302,7 +312,8 @@ function App() {
 
 
     try {
-      const response = await fetch('http://localhost:8080/api/plan', {
+      const apiHost = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiHost}/api/plan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

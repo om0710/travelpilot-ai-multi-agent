@@ -50,7 +50,7 @@ def extract_details(query: str) -> dict:
     2. Destination city or country (where they will travel TO).
        *IMPORTANT*: If the user does not specify a destination, but explicitly asks you to choose, suggest, recommend, decide, or says "according to you", "you choose", "surprise me", "anywhere", then choose a popular travel destination (like "Rome, Italy", "Tokyo, Japan", "Paris, France", or "Jaipur, India") and set it as the "destination". Do NOT return null in this case.
     3. Exact travel dates or start date.
-    4. Number of days of the trip (default to 3 if not specified).
+    4. Number of days of the trip (default to 3 if not specified). *IMPORTANT*: Calculate the exact number of days of the trip from the date range if specified (for example, "23 to 29 August" is 7 days).
     
     Respond ONLY in raw JSON matching this structure:
     {{
