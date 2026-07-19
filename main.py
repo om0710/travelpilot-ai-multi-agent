@@ -95,6 +95,18 @@ def flight_agent(state :TravelState ):
             ]
         }
     
+    # Check if flight results are already present and no flight-related changes are requested in the latest message
+    user_query = state.get("user_query", "").lower()
+    has_flight_intent = any(w in user_query for w in ["flight", "fly", "departure", "from", "airline", "indigo", "air india", "ticket", "date"])
+    
+    if state.get("flight_results") and not has_flight_intent:
+        return {
+            "flight_results": state.get("flight_results"),
+            "messages": [
+                AIMessage(content="Flight results retained (no changes requested)")
+            ]
+        }
+    
     # Query flights from departure city to destination
     flight_data = search_flights(f"from {state['departure']} to {state['destination']}")
     
@@ -111,6 +123,18 @@ def hotel_agent(state :TravelState ):
             "hotel_results": "MISSING_INFO",
             "messages": [
                 AIMessage(content="Waiting for details...")
+            ]
+        }
+        
+    # Check if hotel results are already present and no hotel-related changes are requested in the latest message
+    user_query = state.get("user_query", "").lower()
+    has_hotel_intent = any(w in user_query for w in ["hotel", "stay", "accommodation", "resort", "hostel", "room", "cheap", "budget", "luxury", "lodging"])
+    
+    if state.get("hotel_results") and not has_hotel_intent:
+        return {
+            "hotel_results": state.get("hotel_results"),
+            "messages": [
+                AIMessage(content="Hotel results retained (no changes requested)")
             ]
         }
         
@@ -156,6 +180,18 @@ def itinerary_agent(state: TravelState):
             "messages": [response]
         }
 
+    # Check if itinerary is already present and no itinerary/schedule changes are requested
+    user_query = state.get("user_query", "").lower()
+    has_itinerary_intent = any(w in user_query for w in ["itinerary", "schedule", "plan", "day", "visit", "sightseeing", "morning", "afternoon", "evening", "activity", "museum", "tour"])
+    
+    if state.get("itinerary") and not has_itinerary_intent:
+        return {
+            "itinerary": state.get("itinerary"),
+            "messages": [
+                AIMessage(content="Itinerary retained (no changes requested)")
+            ]
+        }
+
     dest = state.get("destination") or "your destination"
     days = state.get("days", 3)
 
@@ -173,6 +209,7 @@ def itinerary_agent(state: TravelState):
     1. The itinerary MUST be for {dest} only. Do not suggest sightseeing in other cities unless they are adjacent/day-trips.
     2. Create the itinerary for EXACTLY {days} days.
     3. Organize into Day 1, Day 2, etc. split into Morning, Afternoon, Evening slots.
+    4. Maintain styling intent of user query.
     """
     response = llm.invoke([
         SystemMessage(

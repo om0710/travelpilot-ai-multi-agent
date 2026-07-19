@@ -152,22 +152,31 @@ def plan_trip(req: PlanRequest):
                 for chunk in workflow.stream(initial_state, config=config, stream_mode="updates"):
                     if "flight_agent" in chunk:
                         flight_res = chunk["flight_agent"].get("flight_results", "")
+                        messages = chunk["flight_agent"].get("messages", [])
+                        msg_content = messages[-1].content if messages else ""
                         if flight_res == "MISSING_INFO":
                             yield f"data: {json.dumps({'event': 'agent_start', 'agent': 'flight', 'progress': 50, 'details': 'Missing critical travel parameters...'})}\n\n"
                         else:
-                            yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'flight', 'details': 'Flight options parsed successfully!'})}\n\n"
+                            details = "Flight options parsed successfully!" if "retained" not in msg_content else "Flight options retained."
+                            yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'flight', 'details': details})}\n\n"
                             yield f"data: {json.dumps({'event': 'agent_start', 'agent': 'hotel', 'progress': 30, 'details': 'Searching Tavily index for accommodations...'})}\n\n"
                             
                     elif "hotel_agent" in chunk:
                         hotel_res = chunk["hotel_agent"].get("hotel_results", "")
+                        messages = chunk["hotel_agent"].get("messages", [])
+                        msg_content = messages[-1].content if messages else ""
                         if hotel_res == "MISSING_INFO":
                             yield f"data: {json.dumps({'event': 'agent_start', 'agent': 'hotel', 'progress': 50, 'details': 'Details incomplete.'})}\n\n"
                         else:
-                            yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'hotel', 'details': 'Accommodations identified successfully!'})}\n\n"
+                            details = "Accommodations identified successfully!" if "retained" not in msg_content else "Hotel recommendations retained."
+                            yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'hotel', 'details': details})}\n\n"
                             yield f"data: {json.dumps({'event': 'agent_start', 'agent': 'itinerary', 'progress': 40, 'details': 'Formatting travel timeline slots...'})}\n\n"
                         
                     elif "itinerary_agent" in chunk:
-                        yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'itinerary', 'details': 'Trip scheduling designed successfully!'})}\n\n"
+                        messages = chunk["itinerary_agent"].get("messages", [])
+                        msg_content = messages[-1].content if messages else ""
+                        details = "Trip scheduling designed successfully!" if "retained" not in msg_content else "Itinerary retained."
+                        yield f"data: {json.dumps({'event': 'agent_complete', 'agent': 'itinerary', 'details': details})}\n\n"
                         yield f"data: {json.dumps({'event': 'agent_start', 'agent': 'final', 'progress': 50, 'details': 'Packaging travel response...'})}\n\n"
                         
                     elif "final_agent" in chunk:
