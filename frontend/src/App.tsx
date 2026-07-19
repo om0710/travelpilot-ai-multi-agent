@@ -232,9 +232,13 @@ function App() {
       [threadId]: currentConvo
     }));
 
-    // Extract destination name
+    // Combine all user messages in this thread to analyze parameters contextually!
+    const allUserMessages = currentConvo.filter(m => m.sender === 'user').map(m => m.content);
+    const combinedQueryText = allUserMessages.join(" | ").toLowerCase();
+
+    // Extract destination name from the combined query context
     let destination = 'Udaipur'; // default fallback
-    const cleanQuery = userMsgText.toLowerCase().trim();
+    const cleanQuery = combinedQueryText;
     if (cleanQuery.includes('tokyo') || cleanQuery.includes('japan')) destination = 'Tokyo, Japan';
     else if (cleanQuery.includes('rome') || cleanQuery.includes('italy')) destination = 'Rome, Italy';
     else if (cleanQuery.includes('paris') || cleanQuery.includes('france')) destination = 'Paris, France';
@@ -243,13 +247,13 @@ function App() {
     else if (cleanQuery.includes('udaipur')) destination = 'Udaipur, India';
     else {
       // Find matches for "to [place]" or "for [place]" or "visit [place]"
-      const match = userMsgText.match(/(?:to|for|visit)\s+([A-Za-z\s]+?)(?:\s+of|\s+for|\s+\d+|\s+day|$)/i);
+      const match = cleanQuery.match(/(?:to|for|visit)\s+([A-Za-z\s]+?)(?:\s+of|\s+for|\s+\d+|\s+day|$)/i);
       if (match && match[1] && match[1].trim()) {
         destination = match[1].trim();
         // Capitalize first letters
         destination = destination.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
       } else {
-        const words = userMsgText.replace(/[^\w\s]/g, '').split(/\s+/);
+        const words = cleanQuery.replace(/[^\w\s]/g, '').split(/\s+/);
         if (words.length > 0) {
           const capWord = words.find(w => w && w.charAt(0) === w.charAt(0).toUpperCase() && w.toLowerCase() !== 'plan' && w.toLowerCase() !== 'trip');
           destination = capWord || words[words.length - 1];
@@ -259,7 +263,7 @@ function App() {
 
     // Parse number of days from query
     let daysCount = 3; // Default
-    const daysMatch = userMsgText.match(/(\d+)\s*day/i);
+    const daysMatch = cleanQuery.match(/(\d+)\s*day/i);
     if (daysMatch && daysMatch[1]) {
       daysCount = parseInt(daysMatch[1]);
     }
@@ -284,11 +288,10 @@ function App() {
     // Set up agent animations
     setAgents(INITIAL_AGENTS.map(a => ({ ...a, status: 'idle', progress: 0, details: undefined })));
 
-    // Validate required query parameters on the client side for instantaneous responses!
-    const queryTextLower = userMsgText.toLowerCase();
-    const hasDeparture = queryTextLower.includes("from ") || queryTextLower.includes("flying from") || queryTextLower.includes("fly from") || queryTextLower.includes("departing from");
-    const hasDates = queryTextLower.includes("on ") || queryTextLower.includes("date") || queryTextLower.includes("january") || queryTextLower.includes("february") || queryTextLower.includes("march") || queryTextLower.includes("april") || queryTextLower.includes("may") || queryTextLower.includes("june") || queryTextLower.includes("july") || queryTextLower.includes("august") || queryTextLower.includes("september") || queryTextLower.includes("october") || queryTextLower.includes("november") || queryTextLower.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(queryTextLower) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(queryTextLower);
-    const hasDestination = queryTextLower.includes("to ") || queryTextLower.includes("trip for") || queryTextLower.includes("visit ") || queryTextLower.includes("jaipur") || queryTextLower.includes("tokyo") || queryTextLower.includes("paris") || queryTextLower.includes("rome") || queryTextLower.includes("swiss") || queryTextLower.includes("switzerland") || queryTextLower.includes("delhi") || queryTextLower.includes("udaipur");
+    // Validate required query parameters on the client side using the combined query text!
+    const hasDeparture = combinedQueryText.includes("from ") || combinedQueryText.includes("flying from") || combinedQueryText.includes("fly from") || combinedQueryText.includes("departing from");
+    const hasDates = combinedQueryText.includes("on ") || combinedQueryText.includes("date") || combinedQueryText.includes("january") || combinedQueryText.includes("february") || combinedQueryText.includes("march") || combinedQueryText.includes("april") || combinedQueryText.includes("may") || combinedQueryText.includes("june") || combinedQueryText.includes("july") || combinedQueryText.includes("august") || combinedQueryText.includes("september") || combinedQueryText.includes("october") || combinedQueryText.includes("november") || combinedQueryText.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(combinedQueryText) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(combinedQueryText);
+    const hasDestination = combinedQueryText.includes("to ") || combinedQueryText.includes("trip for") || combinedQueryText.includes("visit ") || combinedQueryText.includes("jaipur") || combinedQueryText.includes("tokyo") || combinedQueryText.includes("paris") || combinedQueryText.includes("rome") || combinedQueryText.includes("swiss") || combinedQueryText.includes("switzerland") || combinedQueryText.includes("delhi") || combinedQueryText.includes("udaipur");
 
     if (!hasDeparture || !hasDestination || !hasDates) {
       setTimeout(() => {
@@ -401,7 +404,7 @@ function App() {
     } catch (err) {
       console.warn("Backend unavailable or streaming failed, running offline custom simulation:", err);
       // Fallback: Run local high-fidelity simulation
-      runOfflineSimulation(destination, threadId, streamingId, currentConvo, daysCount, userMsgText);
+      runOfflineSimulation(destination, threadId, streamingId, currentConvo, daysCount, combinedQueryText);
     }
   };
 

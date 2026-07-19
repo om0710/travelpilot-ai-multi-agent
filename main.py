@@ -70,8 +70,14 @@ def extract_details(query: str) -> dict:
     raise ValueError(f"Failed to parse JSON response from LLM: {text}")
 
 def extractor_agent(state: TravelState):
-    query = state["user_query"]
-    details = extract_details(query)
+    # Retrieve all human message contents to form a complete consolidated context
+    user_messages = [msg.content for msg in state.get("messages", []) if isinstance(msg, HumanMessage) or (hasattr(msg, 'type') and msg.type == 'human')]
+    query = state.get("user_query", "")
+    if query and query not in user_messages:
+        user_messages.append(query)
+    
+    combined_query = " | ".join(user_messages) if user_messages else query
+    details = extract_details(combined_query)
     return {
         "departure": details.get("departure"),
         "destination": details.get("destination"),
