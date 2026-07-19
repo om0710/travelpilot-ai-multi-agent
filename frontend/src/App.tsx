@@ -299,69 +299,7 @@ function App() {
     // Set up agent animations
     setAgents(INITIAL_AGENTS.map(a => ({ ...a, status: 'idle', progress: 0, details: undefined })));
 
-    // Validate required query parameters on the client side using the combined query text!
-    const hasDeparture = combinedQueryText.includes("from ") || 
-                         combinedQueryText.includes("flying from") || 
-                         combinedQueryText.includes("fly from") || 
-                         combinedQueryText.includes("departing from") ||
-                         combinedQueryText.includes("departure") ||
-                         combinedQueryText.includes("leaving") ||
-                         combinedQueryText.includes("departing") ||
-                         combinedQueryText.includes("source") ||
-                         combinedQueryText.includes("origin") ||
-                         combinedQueryText.includes("fly out of") ||
-                         combinedQueryText.includes("flying out of");
-    const hasDates = combinedQueryText.includes("on ") || combinedQueryText.includes("date") || combinedQueryText.includes("january") || combinedQueryText.includes("february") || combinedQueryText.includes("march") || combinedQueryText.includes("april") || combinedQueryText.includes("may") || combinedQueryText.includes("june") || combinedQueryText.includes("july") || combinedQueryText.includes("august") || combinedQueryText.includes("september") || combinedQueryText.includes("october") || combinedQueryText.includes("november") || combinedQueryText.includes("december") || /\b\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/.test(combinedQueryText) || /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/.test(combinedQueryText);
-    const hasDestination = isRecommendationQuery || 
-                           combinedQueryText.includes("to ") || 
-                           combinedQueryText.includes("trip for") || 
-                           combinedQueryText.includes("visit ") || 
-                           combinedQueryText.includes("destination") ||
-                           combinedQueryText.includes("traveling to") ||
-                           combinedQueryText.includes("going to") ||
-                           combinedQueryText.includes("jaipur") || 
-                           combinedQueryText.includes("tokyo") || 
-                           combinedQueryText.includes("paris") || 
-                           combinedQueryText.includes("rome") || 
-                           combinedQueryText.includes("swiss") || 
-                           combinedQueryText.includes("switzerland") || 
-                           combinedQueryText.includes("delhi") || 
-                           combinedQueryText.includes("udaipur");
 
-    if (!hasDeparture || !hasDestination || !hasDates) {
-      setTimeout(() => {
-        updateAgent('flight', 'failed', 0, 'Missing flight parameters...');
-        updateAgent('hotel', 'failed', 0, 'Missing hotel parameters...');
-        updateAgent('itinerary', 'completed', 100, 'Awaiting details...');
-        updateAgent('final', 'completed', 100, 'Response compiled');
-
-        const missingFields: string[] = [];
-        if (!hasDeparture) missingFields.push("departure city (where you will fly from)");
-        if (!hasDestination) missingFields.push("destination city (where you plan to travel)");
-        if (!hasDates) missingFields.push("travel dates (when you plan to travel)");
-
-        const missingStr = missingFields.join(" and ");
-
-        const finalAIMessage: Message = {
-          id: streamingId,
-          sender: 'ai',
-          content: `I would be happy to help you plan your trip! However, to search flights and customize your itinerary, I need you to provide your ${missingStr}. Could you please specify these details?`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-
-        setTripsConversations(prev => ({
-          ...prev,
-          [threadId]: [...currentConvo, finalAIMessage]
-        }));
-
-        setPreviousTrips(prev => prev.map(t => 
-          t.id === threadId 
-            ? { ...t, destination: destination, summary: 'Awaiting details...' } 
-            : t
-        ));
-      }, 400); // Small professional delay for agent panel visuals
-      return;
-    }
 
     try {
       const response = await fetch('http://localhost:8080/api/plan', {
