@@ -472,9 +472,13 @@ function App() {
     else if (checkDest("jaipur")) dest = "Jaipur, India";
     else if (checkDest("udaipur")) dest = "Udaipur, India";
     else if (checkDest("delhi")) dest = "Delhi, India";
+    else if (checkDest("dubai")) dest = "Dubai, UAE";
+    else if (checkDest("london")) dest = "London, UK";
+    else if (checkDest("new york") || checkDest("nyc")) dest = "New York, USA";
+    else if (checkDest("singapore")) dest = "Singapore";
     else {
       // Fallback: regex matching "to [city]" or "for [city]" or "visit [city]"
-      const destMatch = clean.match(/(?:to|for|visit|trip\s+for|trip\s+to)\s+([a-z\s]+?)(?:\s+from|\s+on|\s+for|\s+leaving|\s+flying|\s+\d|$)/i);
+      const destMatch = clean.match(/(?:to|for|visit|trip\s+for|trip\s+to)\s+([a-z\s]+?)(?:\s+from|\s+on|\s+for|\s+leaving|\s+flying|\s+\d|[,.\-\|]|$)/i);
       if (destMatch && destMatch[1] && !destMatch[1].includes(dep.toLowerCase())) {
         dest = destMatch[1].trim();
       }
