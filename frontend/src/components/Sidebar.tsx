@@ -23,9 +23,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
 }) => {
   return (
-    <aside className={`fixed md:static inset-y-0 left-0 z-50 w-80 h-screen border-r border-slate-200/50 dark:border-slate-800/30 flex flex-col justify-between p-6 glass-premium select-none transform transition-transform duration-300 md:translate-x-0 ${
-      isOpen ? 'translate-x-0' : '-translate-x-full'
-    }`}>
+    <aside className={`h-screen select-none transition-all duration-300 shrink-0 overflow-hidden z-50 flex flex-col justify-between
+      fixed md:static inset-y-0 left-0 glass-premium
+      ${isOpen 
+        ? 'w-80 p-6 border-r border-slate-200/50 dark:border-slate-800/30 translate-x-0' 
+        : 'w-0 md:w-0 p-0 md:p-0 border-r-0 translate-x-[-100%] md:translate-x-0'
+      }
+    `}>
       {/* Top Section */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Brand Logo & Close Row */}

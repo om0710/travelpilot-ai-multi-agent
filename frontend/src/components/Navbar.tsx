@@ -11,10 +11,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTripName, onToggleSidebar
     <header className="h-20 border-b border-slate-200/50 dark:border-slate-800/30 flex items-center justify-between px-8 glass-premium z-10 select-none">
       {/* Title & Toggle */}
       <div className="flex items-center space-x-3">
-        {/* Burger menu toggle button for mobile */}
+        {/* Burger menu toggle button for desktop and mobile */}
         <button
           onClick={onToggleSidebar}
-          className="p-2 rounded-xl hover:bg-slate-100/60 dark:hover:bg-slate-800/20 text-slate-500 dark:text-slate-400 md:hidden outline-none cursor-pointer"
+          className="p-2 rounded-xl hover:bg-slate-100/60 dark:hover:bg-slate-800/20 text-slate-500 dark:text-slate-400 outline-none cursor-pointer"
           title="Toggle Sidebar"
         >
           <Menu className="w-5.5 h-5.5" />

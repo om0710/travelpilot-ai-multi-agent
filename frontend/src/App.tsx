@@ -126,7 +126,12 @@ function App() {
   const [inputValue, setInputValue] = useState<string>('');
   const [agents, setAgents] = useState<AgentStatus[]>(INITIAL_AGENTS);
   const [currentTripName, setCurrentTripName] = useState<string>('TravelPilot AI Planner');
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768; // open on desktop, closed on mobile by default
+    }
+    return true;
+  });
 
   // Load theme preference and save
   useEffect(() => {
