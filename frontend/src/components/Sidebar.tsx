@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Compass, Plus, History, Settings, Map, ChevronRight, Trash2 } from 'lucide-react';
+import { Compass, Plus, History, Settings, Map, ChevronRight, Trash2, X } from 'lucide-react';
 import type { TripHistory } from '../types';
 
 interface SidebarProps {
@@ -9,6 +9,8 @@ interface SidebarProps {
   onSelectTrip: (id: string) => void;
   onNewTrip: () => void;
   onDeleteTrip: (id: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,24 +19,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTrip,
   onNewTrip,
   onDeleteTrip,
+  isOpen,
+  onClose,
 }) => {
   return (
-    <aside className="w-80 h-screen border-r border-slate-200/50 dark:border-slate-800/30 flex flex-col justify-between p-6 glass-premium z-10 select-none">
+    <aside className={`fixed md:static inset-y-0 left-0 z-50 w-80 h-screen border-r border-slate-200/50 dark:border-slate-800/30 flex flex-col justify-between p-6 glass-premium select-none transform transition-transform duration-300 md:translate-x-0 ${
+      isOpen ? 'translate-x-0' : '-translate-x-full'
+    }`}>
       {/* Top Section */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Brand Logo */}
-        <div className="flex items-center space-x-3 mb-8 cursor-pointer" onClick={onNewTrip}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center shadow-lg shadow-brand-500/25">
-            <Compass className="w-5 h-5 text-white animate-spin-slow" />
+        {/* Brand Logo & Close Row */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={onNewTrip}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center shadow-lg shadow-brand-500/25">
+              <Compass className="w-5 h-5 text-white animate-spin-slow" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white font-outfit">
+                TravelPilot <span className="text-gradient">AI</span>
+              </h1>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 tracking-wider uppercase font-semibold">
+                Multi-Agent Planner
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white font-outfit">
-              TravelPilot <span className="text-gradient">AI</span>
-            </h1>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 tracking-wider uppercase font-semibold">
-              Multi-Agent Planner
-            </p>
-          </div>
+          
+          {/* Close button for mobile */}
+          <button 
+            onClick={onClose}
+            className="p-1.5 rounded-xl hover:bg-slate-100/60 dark:hover:bg-slate-800/20 text-slate-500 dark:text-slate-400 md:hidden outline-none cursor-pointer"
+          >
+            <X className="w-5.5 h-5.5" />
+          </button>
         </div>
 
         {/* New Trip Button */}

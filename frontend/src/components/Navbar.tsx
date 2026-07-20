@@ -1,19 +1,29 @@
 import React from 'react';
-import { Bell, ShieldCheck } from 'lucide-react';
+import { Bell, ShieldCheck, Menu } from 'lucide-react';
 
 interface NavbarProps {
   currentTripName: string;
+  onToggleSidebar: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentTripName }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentTripName, onToggleSidebar }) => {
   return (
     <header className="h-20 border-b border-slate-200/50 dark:border-slate-800/30 flex items-center justify-between px-8 glass-premium z-10 select-none">
-      {/* Title */}
+      {/* Title & Toggle */}
       <div className="flex items-center space-x-3">
-        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 font-outfit">
+        {/* Burger menu toggle button for mobile */}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-xl hover:bg-slate-100/60 dark:hover:bg-slate-800/20 text-slate-500 dark:text-slate-400 md:hidden outline-none cursor-pointer"
+          title="Toggle Sidebar"
+        >
+          <Menu className="w-5.5 h-5.5" />
+        </button>
+        
+        <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 font-outfit ml-1">
           {currentTripName || "Dashboard"}
         </h2>
-        <div className="flex items-center space-x-1.5 py-1 px-2.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+        <div className="hidden sm:flex items-center space-x-1.5 py-1 px-2.5 rounded-full bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/30 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
           <ShieldCheck className="w-3 h-3" />
           <span>Multi-Agent System Active</span>
         </div>

@@ -126,6 +126,7 @@ function App() {
   const [inputValue, setInputValue] = useState<string>('');
   const [agents, setAgents] = useState<AgentStatus[]>(INITIAL_AGENTS);
   const [currentTripName, setCurrentTripName] = useState<string>('TravelPilot AI Planner');
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   // Load theme preference and save
   useEffect(() => {
@@ -172,11 +173,13 @@ function App() {
 
   const handleSelectTrip = (id: string) => {
     setActiveTripId(id);
+    setSidebarOpen(false);
   };
 
   const handleNewTrip = () => {
     setActiveTripId(null);
     setAgents(INITIAL_AGENTS.map(a => ({ ...a, status: 'idle', progress: 0, details: undefined })));
+    setSidebarOpen(false);
   };
 
   const handleDeleteTrip = (id: string) => {
@@ -1027,11 +1030,24 @@ function App() {
         onSelectTrip={handleSelectTrip}
         onNewTrip={handleNewTrip}
         onDeleteTrip={handleDeleteTrip}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
+
+      {/* Dimmed backdrop overlay for mobile viewports when sidebar is toggled open */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-45 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Central Screen (Navbar + ChatArea) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <Navbar currentTripName={currentTripName} />
+        <Navbar 
+          currentTripName={currentTripName} 
+          onToggleSidebar={() => setSidebarOpen(prev => !prev)} 
+        />
         <ChatArea
           messages={messages}
           inputValue={inputValue}

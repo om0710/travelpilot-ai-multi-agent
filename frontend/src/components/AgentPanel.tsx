@@ -48,7 +48,7 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({ agents }) => {
   };
 
   return (
-    <aside className="w-80 h-screen border-l border-slate-200/50 dark:border-slate-800/30 flex flex-col p-6 glass-premium z-10 select-none overflow-y-auto">
+    <aside className="hidden lg:flex w-80 h-screen border-l border-slate-200/50 dark:border-slate-800/30 flex-col p-6 glass-premium z-10 select-none overflow-y-auto">
       <div className="mb-6">
         <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-outfit uppercase tracking-wider">
           Multi-Agent Core
